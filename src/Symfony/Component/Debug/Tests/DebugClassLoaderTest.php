@@ -13,6 +13,10 @@ namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\DebugClassLoader;
+use Symfony\Component\Debug\Tests\Fixtures\DirectlyImplementsSerializable;
+use Symfony\Component\Debug\Tests\Fixtures\ExtendsAClassImplementingSerializable;
+use Symfony\Component\Debug\Tests\Fixtures\ImplementsAnInterfaceThatExtendsSerializable;
+use Symfony\Component\Debug\Tests\Fixtures\UndirectlyImplementsSerializable;
 
 class DebugClassLoaderTest extends TestCase
 {
@@ -360,6 +364,32 @@ class DebugClassLoaderTest extends TestCase
     public function testEvaluatedCode()
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\DefinitionInEvaluatedCode', true));
+    }
+
+    /**
+     * @dataProvider implementsSerializableProvider
+     */
+    public function testImplementsSerializable(array $expectedDeprecations, string $class): void
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        new $class();
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame($expectedDeprecations, $deprecations);
+    }
+
+    public function implementsSerializableProvider(): array
+    {
+        return [
+            [['The "Symfony\Component\Debug\Tests\Fixtures\DirectlyImplementsSerializable" class implements the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.'], DirectlyImplementsSerializable::class],
+            [[], ExtendsAClassImplementingSerializable::class],
+            [['The "Symfony\Component\Debug\Tests\Fixtures\InterfaceExtendingSerializable" interface extends the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.'], ImplementsAnInterfaceThatExtendsSerializable::class],
+        ];
     }
 }
 

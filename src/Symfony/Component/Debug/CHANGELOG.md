@@ -8,6 +8,7 @@ CHANGELOG
 * added `Exception\FlattenException::getAsString` and
 `Exception\FlattenException::getTraceAsString` to increase compatibility to php
 exception objects
+* trigger deprecations for classes and interfaces implementing or extending the `\Serializable` interface
 
 4.0.0
 -----

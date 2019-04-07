@@ -196,6 +196,10 @@ class DebugClassLoader
 
             $deprecations = $this->checkAnnotations($refl, $name);
 
+            if (!$refl->isInterface() && is_a($class, \Serializable::class, true)) {
+                $deprecations[] = sprintf('The "%s" class extends the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.', $class);
+            }
+
             foreach ($deprecations as $message) {
                 @trigger_error($message, E_USER_DEPRECATED);
             }
@@ -259,11 +263,6 @@ class DebugClassLoader
 
         $parent = \get_parent_class($class);
         $parentAndOwnInterfaces = $this->getOwnInterfaces($class, $parent);
-
-        // at this moment, $parentAndOwnInterfaces contains only the class own interfaces.
-        if (isset($parentAndOwnInterfaces['Serializable']) && !$refl->isInstance(\Serializable::class) && (!$refl->hasMethod('__serialize') || !$refl->hasMethod('__unserialize'))) {
-            $deprecations[] = sprintf('The "%s" %s the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.', $class, $refl->isInterface() ? 'interface extends' : 'class implements');
-        }
 
         if ($parent) {
             $parentAndOwnInterfaces[$parent] = $parent;

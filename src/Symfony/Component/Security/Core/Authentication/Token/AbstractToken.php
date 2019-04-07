@@ -142,6 +142,11 @@ abstract class AbstractToken implements TokenInterface
         }
     }
 
+    public function __serialize(): array
+    {
+        return $this->getState();
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -151,7 +156,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function serialize()
     {
-        $serialized = $this->getState();
+        $serialized = $this->__serialize();
 
         if (null === $isCalledFromOverridingMethod = \func_num_args() ? \func_get_arg(0) : null) {
             $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
@@ -159,6 +164,11 @@ abstract class AbstractToken implements TokenInterface
         }
 
         return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->setState($data);
     }
 
     /**
@@ -170,7 +180,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function unserialize($serialized)
     {
-        $this->setState(\is_array($serialized) ? $serialized : unserialize($serialized));
+        $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
     }
 
     /**

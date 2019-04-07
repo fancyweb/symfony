@@ -72,6 +72,10 @@ class AppVariableTest extends TestCase
         $this->assertEquals($request, $this->appVariable->getRequest());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecated The "Symfony\Component\Security\Core\Authentication\Token\TokenInterface" interface extends the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.
+     */
     public function testGetToken()
     {
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();

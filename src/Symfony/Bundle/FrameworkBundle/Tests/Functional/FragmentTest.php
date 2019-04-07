@@ -15,6 +15,9 @@ class FragmentTest extends WebTestCase
 {
     /**
      * @dataProvider getConfigs
+     *
+     * @group legacy
+     * @expectedDeprecation The "Twig\Profiler\Profile" class implements the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.
      */
     public function testFragment($insulate)
     {

@@ -75,7 +75,12 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertNull($collector->getFirewall());
     }
 
-    /** @dataProvider provideRoles */
+    /**
+     * @dataProvider provideRoles
+     *
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\Security\Core\Authentication\Token\TokenInterface" interface extends the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.
+     */
     public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
     {
         $tokenStorage = new TokenStorage();

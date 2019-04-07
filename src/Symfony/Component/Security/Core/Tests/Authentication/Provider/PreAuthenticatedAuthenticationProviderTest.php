@@ -17,6 +17,10 @@ use Symfony\Component\Security\Core\Exception\LockedException;
 
 class PreAuthenticatedAuthenticationProviderTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\Security\Core\Authentication\Token\TokenInterface" interface extends the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.
+     */
     public function testSupports()
     {
         $provider = $this->getProvider();

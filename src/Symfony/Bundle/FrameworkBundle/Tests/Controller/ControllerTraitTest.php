@@ -59,6 +59,10 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('xml--fr', $response->getContent());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\Security\Core\Authentication\Token\TokenInterface" interface extends the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.
+     */
     public function testGetUser()
     {
         $user = new User('user', 'pass');

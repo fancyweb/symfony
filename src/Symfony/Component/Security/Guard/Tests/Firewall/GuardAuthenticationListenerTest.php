@@ -33,6 +33,10 @@ class GuardAuthenticationListenerTest extends TestCase
     private $request;
     private $rememberMeServices;
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\Security\Core\Authentication\Token\TokenInterface" interface extends the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.
+     */
     public function testHandleSuccess()
     {
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();

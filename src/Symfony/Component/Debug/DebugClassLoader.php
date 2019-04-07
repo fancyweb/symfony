@@ -261,7 +261,7 @@ class DebugClassLoader
         $parentAndOwnInterfaces = $this->getOwnInterfaces($class, $parent);
 
         // at this moment, $parentAndOwnInterfaces contains only the class own interfaces.
-        if (isset($parentAndOwnInterfaces['Serializable']) && (!$refl->hasMethod('__serialize') || !$refl->hasMethod('__unserialize'))) {
+        if (isset($parentAndOwnInterfaces['Serializable']) && !$refl->isInstance(\Serializable::class) && (!$refl->hasMethod('__serialize') || !$refl->hasMethod('__unserialize'))) {
             $deprecations[] = sprintf('The "%s" %s the broken "\Serializable" interface. It is discouraged to do so. It is going to be deprecated and removed in future PHP versions.', $class, $refl->isInterface() ? 'interface extends' : 'class implements');
         }
 

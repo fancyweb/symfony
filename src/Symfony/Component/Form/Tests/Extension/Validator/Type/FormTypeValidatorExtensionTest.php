@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
@@ -74,6 +75,19 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form->submit(['field' => 'wrong']);
 
         $this->assertCount(1, $form->getErrors(true));
+    }
+
+    public function testDisableValidation()
+    {
+        $this->validator
+            ->expects($this->never())
+            ->method('validate');
+
+        $this->factory
+            ->create(FormTypeTest::TESTED_TYPE, null, [
+                'validate' => false,
+            ])
+            ->submit(null);
     }
 
     protected function createForm(array $options = [])

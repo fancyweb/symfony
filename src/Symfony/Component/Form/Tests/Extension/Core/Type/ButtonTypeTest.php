@@ -33,4 +33,11 @@ class ButtonTypeTest extends BaseTypeTest
         $this->expectExceptionMessage('Buttons do not support empty data.');
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }
+
+    public function testFormNoValidate()
+    {
+        $this->assertTrue($this->factory->create(static::TESTED_TYPE, null, [
+            'validate' => false,
+        ])->createView()->vars['attr']['formnovalidate']);
+    }
 }

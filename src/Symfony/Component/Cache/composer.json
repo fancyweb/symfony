@@ -41,6 +41,7 @@
     "conflict": {
         "doctrine/dbal": "<2.5",
         "symfony/dependency-injection": "<3.4",
+        "symfony/http-kernel": ">=5.0",
         "symfony/var-dumper": "<3.4"
     },
     "autoload": {

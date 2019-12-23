@@ -474,4 +474,15 @@ class ByteString extends AbstractString
 
         return $width;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reverse(): AbstractString
+    {
+        $str = clone $this;
+        $str->string = strrev($str->string);
+
+        return $str;
+    }
 }

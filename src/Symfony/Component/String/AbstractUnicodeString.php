@@ -445,6 +445,17 @@ abstract class AbstractUnicodeString extends AbstractString
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reverse(): AbstractString
+    {
+        $str = clone $this;
+        $str->string = implode('', array_reverse($str->chunk(1)));
+
+        return $str;
+    }
+
+    /**
      * @return static
      */
     private function pad(int $len, self $pad, int $type): parent

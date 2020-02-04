@@ -6,6 +6,7 @@ CHANGELOG
 
  * added support to autowire public typed properties in php 7.4
  * added support for defining method calls, a configurator, and property setters in `InlineServiceConfigurator`
+ * Deprecated using autowired `Psr\Container\ContainerInterface` instances, configure them explicitly instead.
 
 5.0.0
 -----

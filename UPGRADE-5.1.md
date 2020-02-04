@@ -6,6 +6,11 @@ Console
 
  * `Command::setHidden()` is final since Symfony 5.1
 
+DependencyInjection
+-------------------
+
+* Deprecated using autowired `Psr\Container\ContainerInterface` instances, configure them explicitly instead.
+
 Dotenv
 ------
 

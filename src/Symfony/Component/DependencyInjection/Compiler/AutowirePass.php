@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -88,6 +90,10 @@ class AutowirePass extends AbstractRecursivePass
     {
         if ($value instanceof TypedReference) {
             if ($ref = $this->getAutowiredReference($value)) {
+                if (is_a($value->getType(), PsrContainerInterface::class, true)) {
+                    @trigger_error(sprintf('Using an autowired "%s" instance in the "%s" service is deprecated since Symfony 5.1, configure it explicitly instead.', is_a($value->getType(), ContainerInterface::class, true) ? ContainerInterface::class : PsrContainerInterface::class, $this->currentId), E_USER_DEPRECATED);
+                }
+
                 return $ref;
             }
             if (ContainerBuilder::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE === $value->getInvalidBehavior()) {
@@ -235,6 +241,10 @@ class AutowirePass extends AbstractRecursivePass
                     } elseif (!$parameter->allowsNull()) {
                         throw new AutowiringFailedException($this->currentId, $failureMessage);
                     }
+                }
+
+                if (is_a($value->getType(), PsrContainerInterface::class, true)) {
+                    @trigger_error(sprintf('Using an autowired "%s" instance in the "%s()" method of the "%s" service is deprecated since Symfony 5.1, configure it explicitly instead.', is_a($value->getType(), ContainerInterface::class, true) ? ContainerInterface::class : PsrContainerInterface::class, $method, $this->currentId), E_USER_DEPRECATED);
                 }
 
                 return $value;

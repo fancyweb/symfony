@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -20,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutowiredContainer;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutowiredContainer74;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
@@ -450,6 +453,83 @@ class IntegrationTest extends TestCase
             'baz' => $container->get('bar_tag'),
         ];
         $this->assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation Using an autowired "Psr\Container\ContainerInterface" instance in the "__construct()" method of the "foo" service is deprecated since Symfony 5.1, configure it explicitly instead.
+     * @expectedDeprecation Using an autowired "Symfony\Component\DependencyInjection\ContainerInterface" instance in the "setContainer()" method of the "foo" service is deprecated since Symfony 5.1, configure it explicitly instead.
+     */
+    public function testUsingAnAutowiredContainerInAMethodIsDeprecated()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', AutowiredContainer::class)
+            ->addMethodCall('setContainer')
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $container->get('foo');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testPassingAContainerInAMethod()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', AutowiredContainer::class)
+            ->addMethodCall('setContainer', [new Reference('service_container')])
+            ->setArguments([new Reference('service_container')])
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $container->get('foo');
+    }
+
+    /**
+     * @requires PHP 7.4
+     *
+     * @group legacy
+     *
+     * @expectedDeprecation Using an autowired "Psr\Container\ContainerInterface" instance in the "foo" service is deprecated since Symfony 5.1, configure it explicitly instead.
+     */
+    public function testUsingAnAutowiredContainerInAPropertyIsDeprecated74()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', AutowiredContainer74::class)
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $this->assertInstanceOf(ContainerInterface::class, $container->get('foo')->container);
+    }
+
+    /**
+     * @requires PHP 7.4
+     *
+     * @group legacy
+     */
+    public function testPassingAContainerInAProperty()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', AutowiredContainer74::class)
+            ->setProperty('container', new Reference('service_container'))
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $this->assertInstanceOf(ContainerInterface::class, $container->get('foo')->container);
     }
 }
 

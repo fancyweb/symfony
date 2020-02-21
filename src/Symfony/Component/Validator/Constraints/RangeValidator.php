@@ -45,6 +45,10 @@ class RangeValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value) && !$value instanceof \DateTimeInterface) {
+            if ($constraint->prettyDateFormat) {
+                $this->setPrettyDateFormat($constraint->prettyDateFormat);
+            }
+
             $this->context->buildViolation($constraint->invalidMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setCode(Range::INVALID_CHARACTERS_ERROR)
@@ -88,6 +92,10 @@ class RangeValidator extends ConstraintValidator
         $hasUpperLimit = null !== $max;
 
         if ($hasLowerLimit && $hasUpperLimit && ($value < $min || $value > $max)) {
+            if ($constraint->prettyDateFormat) {
+                $this->setPrettyDateFormat($constraint->prettyDateFormat);
+            }
+
             $violationBuilder = $this->context->buildViolation($constraint->notInRangeMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ min }}', $this->formatValue($min, self::PRETTY_DATE))
@@ -108,6 +116,10 @@ class RangeValidator extends ConstraintValidator
         }
 
         if ($hasUpperLimit && $value > $max) {
+            if ($constraint->prettyDateFormat) {
+                $this->setPrettyDateFormat($constraint->prettyDateFormat);
+            }
+
             $violationBuilder = $this->context->buildViolation($constraint->maxMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE))
@@ -127,6 +139,10 @@ class RangeValidator extends ConstraintValidator
         }
 
         if ($hasLowerLimit && $value < $min) {
+            if ($constraint->prettyDateFormat) {
+                $this->setPrettyDateFormat($constraint->prettyDateFormat);
+            }
+
             $violationBuilder = $this->context->buildViolation($constraint->minMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))

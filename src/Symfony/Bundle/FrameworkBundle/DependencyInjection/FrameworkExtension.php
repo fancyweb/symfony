@@ -1275,6 +1275,8 @@ class FrameworkExtension extends Extension
             ->setArgument(2, $config['not_compromised_password']['enabled'])
             ->setArgument(3, $config['not_compromised_password']['endpoint'])
         ;
+
+
     }
 
     private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files)

@@ -37,6 +37,8 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
             return;
         }
 
+        $prettyDateFormat = $container->hasParameter('validator.pretty_formats.date') ?
+
         $validators = [];
         foreach ($container->findTaggedServiceIds($this->constraintValidatorTag, true) as $id => $attributes) {
             $definition = $container->getDefinition($id);

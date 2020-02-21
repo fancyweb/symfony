@@ -23,6 +23,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Whether to format {@link \DateTime} objects, either with the {@link \IntlDateFormatter}
      * (if it is available) or as RFC-3339 dates ("Y-m-d H:i:s").
+     *
+     * @see $prettyDateFormat
      */
     const PRETTY_DATE = 1;
 
@@ -35,6 +37,13 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * @var ExecutionContextInterface
      */
     protected $context;
+
+    private $prettyDateFormat = 'Y-m-d H:i:s';
+
+    public function setPrettyDateFormat(string $prettyDateFormat): void
+    {
+        $this->prettyDateFormat = $prettyDateFormat;
+    }
 
     /**
      * {@inheritdoc}
@@ -96,7 +105,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
                 ));
             }
 
-            return $value->format('Y-m-d H:i:s');
+            return $value->format($this->prettyDateFormat);
         }
 
         if (\is_object($value)) {

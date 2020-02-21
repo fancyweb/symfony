@@ -45,6 +45,7 @@ class Range extends Constraint
     public $minPropertyPath;
     public $max;
     public $maxPropertyPath;
+    public $prettyDateFormat;
 
     public function __construct($options = null)
     {

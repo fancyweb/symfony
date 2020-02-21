@@ -27,6 +27,7 @@ abstract class AbstractComparison extends Constraint
     public $message;
     public $value;
     public $propertyPath;
+    public $prettyDateFormat;
 
     /**
      * {@inheritdoc}

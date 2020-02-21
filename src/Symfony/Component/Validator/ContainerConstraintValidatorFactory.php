@@ -53,10 +53,10 @@ class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryI
             }
         }
 
-        if (!$this->validators[$name] instanceof ConstraintValidatorInterface) {
+        if (!$validator = $this->validators[$name] instanceof ConstraintValidatorInterface) {
             throw new UnexpectedTypeException($this->validators[$name], ConstraintValidatorInterface::class);
         }
 
-        return $this->validators[$name];
+        return $validator;
     }
 }

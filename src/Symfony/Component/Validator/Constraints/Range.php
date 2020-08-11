@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Range extends Constraint
 {
+    use WithPrettyDateFormatTrait;
+
     const INVALID_CHARACTERS_ERROR = 'ad9a9798-7a99-4df7-8ce9-46e416a1e60b';
     const NOT_IN_RANGE_ERROR = '04b91c99-a946-4221-afc5-e65ebac401eb';
     const TOO_HIGH_ERROR = '2d28afcb-e32e-45fb-a815-01c431a86a69';
@@ -45,7 +47,6 @@ class Range extends Constraint
     public $minPropertyPath;
     public $max;
     public $maxPropertyPath;
-    public $prettyDateFormat;
 
     public function __construct($options = null)
     {

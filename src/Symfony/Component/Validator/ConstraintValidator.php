@@ -22,9 +22,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
     /**
      * Whether to format {@link \DateTime} objects, either with the {@link \IntlDateFormatter}
-     * (if it is available) or as RFC-3339 dates ("Y-m-d H:i:s").
+     * (if it is available) or as RFC-3339 dates ("Y-m-d H:i:s" by default).
      *
-     * @see $prettyDateFormat
+     * @see setPrettyDateFormatOptions()
      */
     const PRETTY_DATE = 1;
 
@@ -38,12 +38,17 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected $context;
 
-    private $prettyDateFormat = 'Y-m-d H:i:s';
+    /**
+     * @var bool
+     */
+    private $useIntlDateFormatter;
 
-    public function setPrettyDateFormat(string $prettyDateFormat): void
-    {
-        $this->prettyDateFormat = $prettyDateFormat;
-    }
+    /**
+     * @var int[]
+     */
+    private $intlDateFormat;
+
+    private $dateFormat;
 
     /**
      * {@inheritdoc}
@@ -51,6 +56,18 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     public function initialize(ExecutionContextInterface $context)
     {
         $this->context = $context;
+    }
+
+    public function useIntlDateFormatter(bool $useIntlDateFormatter): void
+    {
+        if (($this->useIntlDateFormatter = $useIntlDateFormatter) && !class_exists(\IntlDateFormatter::class)) {
+            throw new \RuntimeException('You todo. Try running "composer require symfony/intl".');
+        }
+    }
+
+    public function setPrettyDateFormat($prettyDateFormat): void
+    {
+        $this->prettyDateFormat = $prettyDateFormat;
     }
 
     /**
@@ -96,8 +113,10 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     protected function formatValue($value, int $format = 0)
     {
         if (($format & self::PRETTY_DATE) && $value instanceof \DateTimeInterface) {
-            if (class_exists('IntlDateFormatter')) {
-                $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
+            if ($this->useIntlDateFormatter ?? \class_exists(\IntlDateFormatter::class)) {
+                $prettyDateFormat = $this->prettyDateFormat ?? [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT];
+
+                $formatter = new \IntlDateFormatter(\Locale::getDefault(), $prettyDateFormat[0], $prettyDateFormat[1], 'UTC');
 
                 return $formatter->format(new \DateTime(
                     $value->format('Y-m-d H:i:s.u'),
@@ -105,7 +124,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
                 ));
             }
 
-            return $value->format($this->prettyDateFormat);
+            return $value->format($this->prettyDateFormat ?? 'Y-m-d H:i:s');
         }
 
         if (\is_object($value)) {
@@ -164,5 +183,16 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         return implode(', ', $values);
+    }
+
+    protected function setPrettyDateFormatOptionsFromConstraint(Constraint $constraint): void
+    {
+        if (null !== ($useIntlDateFormatter = $constraint->useIntlDateFormatter ?? null)) {
+            $this->useIntlDateFormatter($useIntlDateFormatter);
+        }
+
+        if (null !== ($prettyDateFormat = $constraint->prettyDateFormat ?? null)) {
+            $this->setPrettyDateFormat($prettyDateFormat);
+        }
     }
 }

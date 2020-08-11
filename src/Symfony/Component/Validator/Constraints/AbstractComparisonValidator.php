@@ -77,9 +77,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
         }
 
         if (!$this->compareValues($value, $comparedValue)) {
-            if ($constraint->prettyDateFormat) {
-                $this->setPrettyDateFormat($constraint->prettyDateFormat);
-            }
+            $this->setPrettyDateFormatOptionsFromConstraint($constraint);
 
             $violationBuilder = $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE))

@@ -24,10 +24,11 @@ use Symfony\Component\Validator\Exception\LogicException;
  */
 abstract class AbstractComparison extends Constraint
 {
+    use WithPrettyDateFormatTrait;
+
     public $message;
     public $value;
     public $propertyPath;
-    public $prettyDateFormat;
 
     /**
      * {@inheritdoc}

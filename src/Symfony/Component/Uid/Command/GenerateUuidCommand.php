@@ -41,7 +41,7 @@ class GenerateUuidCommand extends Command
     {
         $this
             ->setDefinition([
-                new InputOption('time-based', null, InputOption::VALUE_REQUIRED, 'The timestamp, to generate a time-based UUID: a parsable date/time string. It must be greater than or equals to the UUID epoch (1582-10-15 00:00:00)'),
+                new InputOption('time-based', null, InputOption::VALUE_REQUIRED, 'The timestamp, to generate a time-based UUID: a parsable date/time string'),
                 new InputOption('node', null, InputOption::VALUE_REQUIRED, 'The UUID whose node part should be used as the node of the generated UUID'),
                 new InputOption('name-based', null, InputOption::VALUE_REQUIRED, 'The name, to generate a name-based UUID'),
                 new InputOption('namespace', null, InputOption::VALUE_REQUIRED, 'The UUID to use at the namespace for named-based UUIDs'),
@@ -100,17 +100,31 @@ EOF
         $namespace = $input->getOption('namespace');
         $random = $input->getOption('random-based');
 
-        switch (true) {
-            case !$time && !$node && !$name && !$namespace && !$random:
-                $create = [$this->factory, 'create'];
+        if (null !== ($time ?? $name ?? $random ?? null) && !(null !== $time xor null !== $name xor null !== $random)) {
+            $io->error('Only one of "--time-based", "--name-based" or "--random-based" can be provided at a time.');
 
-                break;
-            case $time && !$name && !$namespace && !$random:
-                if ($node) {
+            return 1;
+        }
+
+        if (null === $time && null !== $node) {
+            $io->error('Option "--node" can only be used with "--time-based".');
+
+            return 1;
+        }
+
+        if (null === $name && null !== $namespace) {
+            $io->error('Option "--namespace" can only be used with "--name-based".');
+
+            return 1;
+        }
+
+        switch (true) {
+            case null !== $time:
+                if (null !== $node) {
                     try {
                         $node = Uuid::fromString($node);
                     } catch (\InvalidArgumentException $e) {
-                        $io->error(sprintf('Invalid node "%s". %s', $node, $e->getMessage()));
+                        $io->error(sprintf('Invalid node "%s": %s', $node, $e->getMessage()));
 
                         return 1;
                     }
@@ -119,74 +133,69 @@ EOF
                 try {
                     $time = new \DateTimeImmutable($time);
                 } catch (\Exception $e) {
-                    $io->error(sprintf('Invalid timestamp "%s". %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
+                    $io->error(sprintf('Invalid timestamp "%s": %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
 
-                    return 2;
+                    return 1;
                 }
 
-                if ($time < new \DateTimeImmutable('@-12219292800')) {
-                    $io->error(sprintf('Invalid timestamp "%s". It must be greater than or equals to the UUID epoch (1582-10-15 00:00:00).', $input->getOption('time-based')));
-
-                    return 3;
-                }
-
-                $create = function () use ($node, $time): Uuid { return $this->factory->timeBased($node)->create($time); };
-
+                $create = function () use ($node, $time): Uuid {
+                    return $this->factory->timeBased($node)->create($time);
+                };
                 break;
-            case $name && !$time && !$node && !$random:
+
+            case null !== $name:
                 if ($namespace) {
                     try {
                         $namespace = Uuid::fromString($namespace);
                     } catch (\InvalidArgumentException $e) {
-                        $io->error(sprintf('Invalid namespace "%s". %s', $namespace, $e->getMessage()));
+                        $io->error(sprintf('Invalid namespace "%s": %s', $namespace, $e->getMessage()));
 
-                        return 4;
-                    }
-                } else {
-                    $refl = new \ReflectionProperty($this->factory, 'nameBasedNamespace');
-                    $refl->setAccessible(true);
-                    if (null === $refl->getValue($this->factory)) {
-                        $io->error('Missing namespace. Use the "--namespace" option or configure a default namespace in the underlying factory.');
-
-                        return 5;
+                        return 1;
                     }
                 }
 
-                $create = function () use ($namespace, $name): Uuid { return $this->factory->nameBased($namespace)->create($name); };
+                $create = function () use ($namespace, $name): Uuid {
+                    try {
+                        $factory = $this->factory->nameBased($namespace);
+                    } catch (\LogicException $e) {
+                        $io->error('Missing namespace: use the "--namespace" option or configure a default namespace in the underlying factory.');
 
+                        return 1;
+                    }
+                        
+                    return $factory->create($name);
+                };
                 break;
-            case $random && !$time && !$node && !$name && !$namespace:
+
+            case null !== $random:
                 $create = [$this->factory->randomBased(), 'create'];
-
                 break;
-            default:
-                $io->error('Invalid combination of options.');
 
-                return 6;
+            default:
+                $create = [$this->factory, 'create'];
+                break;
         }
 
         switch ($input->getOption('format')) {
-            case 'rfc4122':
-                $format = 'strval';
+            case 'base32': $format = 'toBase32'; break;
+            case 'base58': $format = 'toBase58'; break;
+            case 'rfc4122': $format = 'toRfc4122'; break;
 
-                break;
-            case 'base58':
-                $format = static function (Uuid $uuid): string { return $uuid->toBase58(); };
-
-                break;
-            case 'base32':
-                $format = static function (Uuid $uuid): string { return $uuid->toBase32(); };
-
-                break;
             default:
-                $io->error(sprintf('Invalid format "%s". Supported formats are rfc4122, base58 and base32.', $input->getOption('format')));
+                $io->error(sprintf('Invalid format "%s", did you mean "base32", "base58" or "rfc4122"?', $input->getOption('format')));
 
-                return 7;
+                return 1;
         }
 
         $count = (int) $input->getOption('count');
-        for ($i = 0; $i < $count; ++$i) {
-            $io->writeln($format($create()));
+        try {
+            for ($i = 0; $i < $count; ++$i) {
+                $output->writeln($create()->$format());
+            }
+        } catch (\Exception $e) {
+            $io->error($e->getMessage());
+
+            return 1;
         }
 
         return 0;

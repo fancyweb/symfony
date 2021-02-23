@@ -41,7 +41,7 @@ class GenerateUlidCommand extends Command
     {
         $this
             ->setDefinition([
-                new InputOption('time', null, InputOption::VALUE_REQUIRED, 'The ULID timestamp: a parsable date/time string. It must be greater than or equals to the UNIX epoch (1970-01-01 00:00:00)'),
+                new InputOption('time', null, InputOption::VALUE_REQUIRED, 'The ULID timestamp: a parsable date/time string'),
                 new InputOption('count', 'c', InputOption::VALUE_REQUIRED, 'The number of ULID to generate', 1),
                 new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'The ULID output format: base32, base58 or rfc4122', 'base32'),
             ])
@@ -78,40 +78,32 @@ EOF
             try {
                 $time = new \DateTimeImmutable($time);
             } catch (\Exception $e) {
-                $io->error(sprintf('Invalid timestamp "%s". %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
+                $io->error(sprintf('Invalid timestamp "%s": %s', $time, str_replace('DateTimeImmutable::__construct(): ', '', $e->getMessage())));
 
                 return 1;
-            }
-
-            if (0 > $time->format('U')) {
-                $io->error(sprintf('Invalid timestamp "%s". It must be greater than or equals to the UNIX epoch (1970-01-01 00:00:00).', $input->getOption('time')));
-
-                return 2;
             }
         }
 
         switch ($input->getOption('format')) {
-            case 'base32':
-                $format = 'strval';
+            case 'base32': $format = 'toBase32'; break;
+            case 'base58': $format = 'toBase58'; break;
+            case 'rfc4122': $format = 'toRfc4122'; break;
 
-                break;
-            case 'base58':
-                $format = static function (Ulid $ulid): string { return $ulid->toBase58(); };
-
-                break;
-            case 'rfc4122':
-                $format = static function (Ulid $ulid): string { return $ulid->toRfc4122(); };
-
-                break;
             default:
-                $io->error(sprintf('Invalid format "%s". Supported formats are base32, base58 and rfc4122.', $input->getOption('format')));
+                $io->error(sprintf('Invalid format "%s", did you mean "base32", "base58" or "rfc4122"?', $input->getOption('format')));
 
-                return 3;
+                return 1;
         }
 
         $count = (int) $input->getOption('count');
-        for ($i = 0; $i < $count; ++$i) {
-            $output->writeln($format($this->factory->create($time)));
+        try {
+            for ($i = 0; $i < $count; ++$i) {
+                $output->writeln($this->factory->create($time)->$format());
+            }
+        } catch (\Exception $e) {
+            $io->error($e->getMessage());
+
+            return 1;
         }
 
         return 0;

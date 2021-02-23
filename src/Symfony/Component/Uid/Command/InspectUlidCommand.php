@@ -56,7 +56,7 @@ EOF
         try {
             $ulid = Ulid::fromString($input->getArgument('ulid'));
         } catch (\InvalidArgumentException $e) {
-            $io->error(sprintf('Invalid ULID "%s".', $input->getArgument('ulid')));
+            $io->error($e->getMessage());
 
             return 1;
         }

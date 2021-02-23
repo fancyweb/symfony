@@ -59,7 +59,7 @@ EOF
             /** @var Uuid $uuid */
             $uuid = Uuid::fromString($input->getArgument('uuid'));
         } catch (\InvalidArgumentException $e) {
-            $io->error(sprintf('Invalid UUID "%s".', $input->getArgument('uuid')));
+            $io->error($e->getMessage());
 
             return 1;
         }

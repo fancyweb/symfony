@@ -20,19 +20,12 @@ use Symfony\Component\Filesystem\Exception\IOException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Filesystem
+class Filesystem implements FilesystemInterface
 {
     private static $lastError;
 
     /**
-     * Copies a file.
-     *
-     * If the target file is older than the origin file, it's always overwritten.
-     * If the target file is newer, it is overwritten only when the
-     * $overwriteNewerFiles option is set to true.
-     *
-     * @throws FileNotFoundException When originFile doesn't exist
-     * @throws IOException           When copy fails
+     * {@inheritdoc}
      */
     public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false)
     {
@@ -80,11 +73,7 @@ class Filesystem
     }
 
     /**
-     * Creates a directory recursively.
-     *
-     * @param string|iterable $dirs The directory path
-     *
-     * @throws IOException On any directory creation failure
+     * {@inheritdoc}
      */
     public function mkdir($dirs, int $mode = 0777)
     {
@@ -100,11 +89,7 @@ class Filesystem
     }
 
     /**
-     * Checks the existence of files or directories.
-     *
-     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to check
-     *
-     * @return bool true if the file exists, false otherwise
+     * {@inheritdoc}
      */
     public function exists($files)
     {
@@ -124,13 +109,7 @@ class Filesystem
     }
 
     /**
-     * Sets access and modification time of file.
-     *
-     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to create
-     * @param int|null        $time  The touch time as a Unix timestamp, if not supplied the current system time is used
-     * @param int|null        $atime The access time as a Unix timestamp, if not supplied the current system time is used
-     *
-     * @throws IOException When touch fails
+     * {@inheritdoc}
      */
     public function touch($files, int $time = null, int $atime = null)
     {
@@ -142,11 +121,7 @@ class Filesystem
     }
 
     /**
-     * Removes files or directories.
-     *
-     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to remove
-     *
-     * @throws IOException When removal fails
+     * {@inheritdoc}
      */
     public function remove($files)
     {
@@ -206,14 +181,7 @@ class Filesystem
     }
 
     /**
-     * Change mode for an array of files or directories.
-     *
-     * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change mode
-     * @param int             $mode      The new mode (octal)
-     * @param int             $umask     The mode mask (octal)
-     * @param bool            $recursive Whether change the mod recursively or not
-     *
-     * @throws IOException When the change fails
+     * {@inheritdoc}
      */
     public function chmod($files, int $mode, int $umask = 0000, bool $recursive = false)
     {
@@ -228,13 +196,7 @@ class Filesystem
     }
 
     /**
-     * Change the owner of an array of files or directories.
-     *
-     * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change owner
-     * @param string|int      $user      A user name or number
-     * @param bool            $recursive Whether change the owner recursively or not
-     *
-     * @throws IOException When the change fails
+     * {@inheritdoc}
      */
     public function chown($files, $user, bool $recursive = false)
     {
@@ -255,13 +217,7 @@ class Filesystem
     }
 
     /**
-     * Change the group of an array of files or directories.
-     *
-     * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change group
-     * @param string|int      $group     A group name or number
-     * @param bool            $recursive Whether change the group recursively or not
-     *
-     * @throws IOException When the change fails
+     * {@inheritdoc}
      */
     public function chgrp($files, $group, bool $recursive = false)
     {
@@ -282,10 +238,7 @@ class Filesystem
     }
 
     /**
-     * Renames a file or a directory.
-     *
-     * @throws IOException When target file or directory already exists
-     * @throws IOException When origin cannot be renamed
+     * {@inheritdoc}
      */
     public function rename(string $origin, string $target, bool $overwrite = false)
     {
@@ -307,9 +260,7 @@ class Filesystem
     }
 
     /**
-     * Tells whether a file exists and is readable.
-     *
-     * @throws IOException When windows path is longer than 258 characters
+     * {@inheritdoc}
      */
     private function isReadable(string $filename): bool
     {
@@ -323,9 +274,7 @@ class Filesystem
     }
 
     /**
-     * Creates a symbolic link or copy a directory.
-     *
-     * @throws IOException When symlink fails
+     * {@inheritdoc}
      */
     public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false)
     {
@@ -355,12 +304,7 @@ class Filesystem
     }
 
     /**
-     * Creates a hard link, or several hard links to a file.
-     *
-     * @param string|string[] $targetFiles The target file(s)
-     *
-     * @throws FileNotFoundException When original file is missing or not a file
-     * @throws IOException           When link fails, including if link already exists
+     * {@inheritdoc}
      */
     public function hardlink(string $originFile, $targetFiles)
     {
@@ -387,7 +331,7 @@ class Filesystem
     }
 
     /**
-     * @param string $linkType Name of the link type, typically 'symbolic' or 'hard'
+     * {@inheritdoc}
      */
     private function linkException(string $origin, string $target, string $linkType)
     {
@@ -400,17 +344,7 @@ class Filesystem
     }
 
     /**
-     * Resolves links in paths.
-     *
-     * With $canonicalize = false (default)
-     *      - if $path does not exist or is not a link, returns null
-     *      - if $path is a link, returns the next direct target of the link without considering the existence of the target
-     *
-     * With $canonicalize = true
-     *      - if $path does not exist, returns null
-     *      - if $path exists, returns its absolute fully resolved final version
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
     public function readlink(string $path, bool $canonicalize = false)
     {
@@ -438,9 +372,7 @@ class Filesystem
     }
 
     /**
-     * Given an existing path, convert it to a path relative to a given starting path.
-     *
-     * @return string Path of target relative to starting path
+     * {@inheritdoc}
      */
     public function makePathRelative(string $endPath, string $startPath)
     {
@@ -514,21 +446,7 @@ class Filesystem
     }
 
     /**
-     * Mirrors a directory to another.
-     *
-     * Copies files and directories from the origin directory into the target directory. By default:
-     *
-     *  - existing files in the target directory will be overwritten, except if they are newer (see the `override` option)
-     *  - files in the target directory that do not exist in the source directory will not be deleted (see the `delete` option)
-     *
-     * @param \Traversable|null $iterator Iterator that filters which files and directories to copy, if null a recursive iterator is created
-     * @param array             $options  An array of boolean options
-     *                                    Valid options are:
-     *                                    - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
-     *                                    - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
-     *                                    - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
-     *
-     * @throws IOException When file type is unknown
+     * {@inheritdoc}
      */
     public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = [])
     {
@@ -587,9 +505,7 @@ class Filesystem
     }
 
     /**
-     * Returns whether the file path is an absolute path.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isAbsolutePath(string $file)
     {
@@ -603,13 +519,7 @@ class Filesystem
     }
 
     /**
-     * Creates a temporary file with support for custom stream wrappers.
-     *
-     * @param string $prefix The prefix of the generated temporary filename
-     *                       Note: Windows uses only the first three characters of prefix
-     * @param string $suffix The suffix of the generated temporary filename
-     *
-     * @return string The new temporary filename (with path), or throw an exception on failure
+     * {@inheritdoc}
      */
     public function tempnam(string $dir, string $prefix/*, string $suffix = ''*/)
     {
@@ -651,11 +561,7 @@ class Filesystem
     }
 
     /**
-     * Atomically dumps content into a file.
-     *
-     * @param string|resource $content The data to write into the file
-     *
-     * @throws IOException if the file cannot be written to
+     * {@inheritdoc}
      */
     public function dumpFile(string $filename, $content)
     {
@@ -693,11 +599,7 @@ class Filesystem
     }
 
     /**
-     * Appends content to an existing file.
-     *
-     * @param string|resource $content The content to append
-     *
-     * @throws IOException If the file is not writable
+     * {@inheritdoc}
      */
     public function appendToFile(string $filename, $content)
     {

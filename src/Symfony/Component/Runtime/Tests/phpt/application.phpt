@@ -1,5 +1,7 @@
 --TEST--
 Test Application
+--SKIPIF--
+<?php if (n) die('Skipping on Windows without mbstring');
 --INI--
 display_errors=1
 --FILE--

@@ -40,6 +40,6 @@
     },
     "minimum-stability": "dev",
     "extra": {
-        "class": "Symfony\\Component\\Runtime\\Internal\\ComposerPlugin"
+        "class": "Symfony\\Component\\Runtime\\Composer\\ComposerPlugin"
     }
 }

@@ -9,13 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Runtime\Internal;
+namespace Symfony\Component\Runtime\Composer;
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
+use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Runtime\RuntimeInterface;
@@ -23,16 +24,9 @@ use Symfony\Component\Runtime\SymfonyRuntime;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @internal
  */
 class ComposerPlugin implements PluginInterface, EventSubscriberInterface
 {
-    /**
-     * @var Composer
-     */
-    private $composer;
-
     /**
      * @var IOInterface
      */
@@ -43,7 +37,6 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
     public function activate(Composer $composer, IOInterface $io): void
     {
         self::$activated = true;
-        $this->composer = $composer;
         $this->io = $io;
     }
 
@@ -57,12 +50,13 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
         @unlink($composer->getConfig()->get('vendor-dir').'/autoload_runtime.php');
     }
 
-    public function updateAutoloadFile(): void
+    public static function updateAutoloadFile(Event $event): void
     {
-        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
+        $composer = $event->getComposer();
+        $vendorDir = $composer->getConfig()->get('vendor-dir');
 
         if (!is_file($autoloadFile = $vendorDir.'/autoload.php')
-            || false === $extra = $this->composer->getPackage()->getExtra()['runtime'] ?? []
+            || false === $extra = $composer->getPackage()->getExtra()['runtime'] ?? []
         ) {
             return;
         }
@@ -78,7 +72,7 @@ class ComposerPlugin implements PluginInterface, EventSubscriberInterface
             }
 
             if (!is_file($autoloadTemplate)) {
-                throw new \InvalidArgumentException(sprintf('File "%s" defined under "extra.runtime.autoload_template" in your composer.json file not found.', $this->composer->getPackage()->getExtra()['runtime']['autoload_template']));
+                throw new \InvalidArgumentException(sprintf('File "%s" defined under "extra.runtime.autoload_template" in your composer.json file not found.', $composer->getPackage()->getExtra()['runtime']['autoload_template']));
             }
         }
 

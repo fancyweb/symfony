@@ -190,6 +190,8 @@ use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Uid\AbstractUid;
+use Symfony\Component\Uid\ArgumentResolver\UidValueResolver;
 use Symfony\Component\Uid\Factory\UuidFactory;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -2545,6 +2547,18 @@ class FrameworkExtension extends Extension
             $container->getDefinition('name_based_uuid.factory')
                 ->setArguments([$config['name_based_uuid_namespace']]);
         }
+
+        if (!$config['argument_value_resolver']['enabled']) {
+            $container->removeDefinition('argument_resolver.uid');
+
+            return;
+        } elseif (!class_exists(UidValueResolver::class)) {
+            throw new LogicException('Uid argument value resolver cannot be enabled as the installed Uid component version is too low. Try running "composer require symfony/uid:^6.1".');
+        }
+
+        $container->setParameter('uid.base58', AbstractUid::BASE58);
+        $container->setParameter('uid.base32', AbstractUid::BASE32);
+        $container->setParameter('uid.rfc4122', AbstractUid::RFC4122);
     }
 
     private function resolveTrustedHeaders(array $headers): int

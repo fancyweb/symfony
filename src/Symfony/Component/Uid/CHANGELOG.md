@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+6.1
+---
+
+ * Add the `UidValueResolver` argument value resolver
+
 5.4
 ---
 

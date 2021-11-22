@@ -20,6 +20,8 @@ namespace Symfony\Component\Uid;
  */
 class Ulid extends AbstractUid
 {
+    public const CANONICAL = self::BASE32;
+
     protected const NIL = '00000000000000000000000000';
 
     private static string $time = '';

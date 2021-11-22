@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Uid\ArgumentResolver\UidValueResolver;
 use Symfony\Component\Uid\Factory\NameBasedUuidFactory;
 use Symfony\Component\Uid\Factory\RandomBasedUuidFactory;
 use Symfony\Component\Uid\Factory\TimeBasedUuidFactory;
@@ -37,5 +38,8 @@ return static function (ContainerConfigurator $container) {
         ->set('time_based_uuid.factory', TimeBasedUuidFactory::class)
             ->factory([service('uuid.factory'), 'timeBased'])
         ->alias(TimeBasedUuidFactory::class, 'time_based_uuid.factory')
+
+        ->set('argument_resolver.uid', UidValueResolver::class)
+            ->tag('controller.argument_value_resolver', ['priority' => 150]) // Higher than RequestAttributeValueResolver
     ;
 };

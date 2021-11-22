@@ -735,6 +735,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="uid">
+        <xsd:sequence>
+            <xsd:element name="argument_value_resolver" type="uid_argument_value_resolver" minOccurs="0" />
+        </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="default_uuid_version" type="default_uuid_version" />
         <xsd:attribute name="name_based_uuid_version" type="name_based_uuid_version" />
@@ -764,6 +767,10 @@
             <xsd:enumeration value="1" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="uid_argument_value_resolver">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
 
     <xsd:complexType name="notifier">
         <xsd:sequence>

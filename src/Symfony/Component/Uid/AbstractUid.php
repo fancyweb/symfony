@@ -16,6 +16,10 @@ namespace Symfony\Component\Uid;
  */
 abstract class AbstractUid implements \JsonSerializable
 {
+    public const BASE58 = '[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{22}';
+    public const BASE32 = '[0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz]{26}';
+    public const RFC4122 = '[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}';
+
     /**
      * The identifier in its canonic representation.
      */

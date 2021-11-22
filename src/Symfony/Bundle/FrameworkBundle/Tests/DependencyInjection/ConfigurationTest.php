@@ -580,6 +580,9 @@ class ConfigurationTest extends TestCase
                 'default_uuid_version' => 6,
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 6,
+                'argument_value_resolver' => [
+                    'enabled' => false,
+                ],
             ],
             'exceptions' => [],
         ];

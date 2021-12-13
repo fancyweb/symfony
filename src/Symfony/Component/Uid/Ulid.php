@@ -62,6 +62,14 @@ class Ulid extends AbstractUid
     /**
      * {@inheritdoc}
      */
+    public static function fromCanonical(string $uid): static
+    {
+        return static::fromBase32($uid);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public static function fromString(string $ulid): static
     {
         if (36 === \strlen($ulid) && Uuid::isValid($ulid)) {

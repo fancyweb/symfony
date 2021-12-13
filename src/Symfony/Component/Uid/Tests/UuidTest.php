@@ -333,4 +333,19 @@ class UuidTest extends TestCase
     {
         $this->assertInstanceOf(Uuid::class, Uuid::fromString('111111111u9QRyVM94rdmZ'));
     }
+
+    public function testFromCanonical()
+    {
+        $this->assertEquals(
+            new UuidV4('76754763-d3ff-48e9-8f7b-d087a02de671'),
+            Uuid::fromCanonical('76754763-d3ff-48e9-8f7b-d087a02de671')
+        );
+    }
+
+    public function testFromCanonicalInvalidFormat()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Uuid::fromCanonical('2VN0S74HBDBB0AQRXAHFVG35KK');
+    }
 }

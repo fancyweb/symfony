@@ -12,6 +12,8 @@
 namespace Symfony\Component\Uid;
 
 /**
+ * @method static static fromCanonical(string $uid) Creates an AbstractUid from an identifier represented in its canonical format.
+ *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 abstract class AbstractUid implements \JsonSerializable

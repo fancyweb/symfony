@@ -261,4 +261,19 @@ class UlidTest extends TestCase
     {
         $this->assertSame('00000000000000000000000000', (string) new NilUlid());
     }
+
+    public function testFromCanonical()
+    {
+        $this->assertEquals(
+            new Ulid('01FPTDDH9TYTQ0C12BNVFVSR4Z'),
+            Ulid::fromCanonical('01FPTDDH9TYTQ0C12BNVFVSR4Z')
+        );
+    }
+
+    public function testFromCanonicalInvalidFormat()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Ulid::fromCanonical('0177058f-4dac-d0b2-a990-a49af02bc008');
+    }
 }

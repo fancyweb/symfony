@@ -37,6 +37,14 @@ class Uuid extends AbstractUid
         $this->uid = strtolower($uuid);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function fromCanonical(string $uid): static
+    {
+        return static::fromRfc4122($uid);
+    }
+
     public static function fromString(string $uuid): static
     {
         if (22 === \strlen($uuid) && 22 === strspn($uuid, BinaryUtil::BASE58[''])) {

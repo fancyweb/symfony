@@ -7,6 +7,8 @@ CHANGELOG
  * Deprecate `Constraint::$errorNames`, use `Constraint::ERROR_NAMES` instead
  * Deprecate constraint `ExpressionLanguageSyntax`, use `ExpressionSyntax` instead
  * Add method `__toString()` to `ConstraintViolationInterface` & `ConstraintViolationListInterface`
+ * Add the `PrimitiveArray`, `PrimitiveBool`, `PrimitiveCallable`, `PrimitiveFloat`, `PrimitiveInt`,
+   `PrimitiveIterable`, `PrimitiveObject`, and `PrimitiveString` constraints
 
 6.0
 ---

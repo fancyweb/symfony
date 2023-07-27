@@ -50,6 +50,16 @@ abstract class AbstractPart
         yield from $this->bodyToIterable();
     }
 
+    public function __serialize(): array
+    {
+        return ['headers' => $this->headers];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->headers = $data['headers'] ?? $data["\x00Symfony\Component\Mime\Part\AbstractPart\x00headers"] ?? $data["\x00*\x00_headers"];
+    }
+
     public function asDebugString(): string
     {
         return $this->getMediaType().'/'.$this->getMediaSubtype();

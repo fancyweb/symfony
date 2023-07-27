@@ -53,6 +53,17 @@ final class FormDataPart extends AbstractMultipartPart
         return $this->prepareFields($this->fields);
     }
 
+    public function __serialize(): array
+    {
+        return [...parent::__serialize(), 'fields' => $this->fields];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+        $this->fields = $data['fields'] ?? $data["\x00Symfony\Component\Mime\Part\Multipart\FormDataPart\x00fields"];
+    }
+
     private function prepareFields(array $fields): array
     {
         $values = [];

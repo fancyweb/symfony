@@ -23,7 +23,10 @@ use Symfony\Component\Mime\Header\Headers;
  */
 class TextPart extends AbstractPart
 {
-    /** @internal */
+    /**
+     * @internal
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     protected Headers $_headers;
 
     private static array $encoders = [];
@@ -219,8 +222,13 @@ class TextPart extends AbstractPart
         return 'quoted-printable';
     }
 
+    /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     public function __sleep(): array
     {
+        trigger_deprecation('symfony/mime', '6.4', 'The "%s()" method is deprecated and will be removed in Symfony 7.0.', __METHOD__);
+
         // convert resources to strings for serialization
         if (null !== $this->seekable || $this->body instanceof File) {
             $this->body = $this->getBody();
@@ -233,12 +241,38 @@ class TextPart extends AbstractPart
     }
 
     /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     *
      * @return void
      */
     public function __wakeup()
     {
+        trigger_deprecation('symfony/mime', '6.4', 'The "%s()" method is deprecated and will be removed in Symfony 7.0.', __METHOD__);
+
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
+    }
+
+    public function __serialize(): array
+    {
+        // convert resources to strings for serialization
+        if (null !== $this->seekable || $this->body instanceof File) {
+            $this->body = $this->getBody();
+            $this->seekable = null;
+        }
+
+        return [...parent::__serialize(), 'body' => $this->body, 'charset' => $this->charset, 'subtype' => $this->subtype, 'disposition' => $this->disposition, 'name' => $this->name, 'encoding' => $this->encoding];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+        $this->body = $data['body'] ?? $data["\x00Symfony\Component\Mime\Part\TextPart\x00body"] ?? $data["\x00*\x00_parent"]['body'];
+        $this->charset = \array_key_exists('charset', $data) ? $data['charset'] : (\array_key_exists("\x00Symfony\Component\Mime\Part\TextPart\x00charset", $data) ? $data["\x00Symfony\Component\Mime\Part\TextPart\x00charset"] : $data["\x00*\x00_parent"]['charset']);
+        $this->subtype = $data['subtype'] ?? $data["\x00Symfony\Component\Mime\Part\TextPart\x00subtype"]  ?? $data["\x00*\x00_parent"]['subtype'];
+        $this->disposition = \array_key_exists('disposition', $data) ? $data['disposition'] : (\array_key_exists("\x00Symfony\Component\Mime\Part\TextPart\x00disposition", $data) ? $data["\x00Symfony\Component\Mime\Part\TextPart\x00disposition"] : $data["\x00*\x00_parent"]['disposition']);
+        $this->name = \array_key_exists('name', $data) ? $data['name'] : (\array_key_exists("\x00Symfony\Component\Mime\Part\TextPart\x00name", $data) ? $data["\x00Symfony\Component\Mime\Part\TextPart\x00name"] : $data["\x00*\x00_parent"]['name']);
+        $this->encoding = $data['encoding'] ?? $data["\x00Symfony\Component\Mime\Part\TextPart\x00encoding"] ?? $data["\x00*\x00_parent"]['encoding'];
     }
 }

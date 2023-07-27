@@ -88,6 +88,18 @@ abstract class AbstractMultipartPart extends AbstractPart
         return $str;
     }
 
+    public function __serialize(): array
+    {
+        return [...parent::__serialize(), 'boundary' => $this->boundary, 'parts' => $this->parts];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+        $this->boundary = \array_key_exists('boundary', $data) ? $data['boundary'] : $data["\x00Symfony\Component\Mime\Part\AbstractMultipartPart\x00boundary"];
+        $this->parts = $data['parts'] ?? $data["\x00Symfony\Component\Mime\Part\AbstractMultipartPart\x00parts"];
+    }
+
     private function getBoundary(): string
     {
         return $this->boundary ??= strtr(base64_encode(random_bytes(6)), '+/', '-_');

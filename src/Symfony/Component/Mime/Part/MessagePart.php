@@ -60,13 +60,33 @@ class MessagePart extends DataPart
         return $this->message->toIterable();
     }
 
+    /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     public function __sleep(): array
     {
+        trigger_deprecation('symfony/mime', '6.4', 'The "%s()" method is deprecated and will be removed in Symfony 7.0.', __METHOD__);
+
         return ['message'];
     }
 
+    /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     public function __wakeup(): void
     {
+        trigger_deprecation('symfony/mime', '6.4', 'The "%s()" method is deprecated and will be removed in Symfony 7.0.', __METHOD__);
+
         $this->__construct($this->message);
+    }
+
+    public function __serialize(): array
+    {
+        return ['message' => $this->message];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->__construct($data['message'] ?? $data["\x00Symfony\Component\Mime\Part\MessagePart\x00message"]);
     }
 }

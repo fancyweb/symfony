@@ -19,7 +19,10 @@ use Symfony\Component\Mime\Header\Headers;
  */
 class DataPart extends TextPart
 {
-    /** @internal */
+    /**
+     * @internal
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     protected array $_parent;
 
     private ?string $filename = null;
@@ -129,8 +132,13 @@ class DataPart extends TextPart
         return bin2hex(random_bytes(16)).'@symfony';
     }
 
+    /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     public function __sleep(): array
     {
+        trigger_deprecation('symfony/mime', '6.4', 'The "%s()" method is deprecated and will be removed in Symfony 7.0.', __METHOD__);
+
         // converts the body to a string
         parent::__sleep();
 
@@ -145,10 +153,14 @@ class DataPart extends TextPart
     }
 
     /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     *
      * @return void
      */
     public function __wakeup()
     {
+        trigger_deprecation('symfony/mime', '6.4', 'The "%s()" method is deprecated and will be removed in Symfony 7.0.', __METHOD__);
+
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
@@ -164,5 +176,17 @@ class DataPart extends TextPart
             $r->setValue($this, $this->_parent[$name]);
         }
         unset($this->_parent);
+    }
+
+    public function __serialize(): array
+    {
+        return [...parent::__serialize(), 'filename' => $this->filename, 'mediaType' => $this->mediaType];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+        $this->filename = \array_key_exists('filename', $data) ? $data['filename'] : $data["\x00Symfony\Component\Mime\Part\DataPart\x00filename"];
+        $this->mediaType = $data['mediaType'] ?? $data["\x00Symfony\Component\Mime\Part\DataPart\x00mediaType"];
     }
 }

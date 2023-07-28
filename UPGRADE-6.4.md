@@ -55,6 +55,13 @@ Messenger
 
  * Deprecate `StopWorkerOnSignalsListener` in favor of using the `SignalableCommandInterface`
 
+Mime
+----
+
+* Deprecate `DataPart::__sleep()`, `DataPart::__wakeup()`, `MessagePart::__sleep()`,
+  `MessagePart::__wakeup()`, `SMimePart::__sleep()`, `SMimePart::__wakeup()`,
+  `TextPart::__sleep()` and `TextPart::__wakeup()`
+
 MonologBridge
 -------------
 

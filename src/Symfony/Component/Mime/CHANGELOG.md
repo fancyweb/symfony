@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+6.4
+
+ * Deprecate `DataPart::__sleep()`, `DataPart::__wakeup()`, `MessagePart::__sleep()`,
+   `MessagePart::__wakeup()`, `SMimePart::__sleep()`, `SMimePart::__wakeup()`,
+   `TextPart::__sleep()` and `TextPart::__wakeup()`
+
 6.3
 ---
 

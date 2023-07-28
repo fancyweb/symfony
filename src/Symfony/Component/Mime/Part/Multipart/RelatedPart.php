@@ -39,6 +39,17 @@ final class RelatedPart extends AbstractMultipartPart
         return 'related';
     }
 
+    public function __serialize(): array
+    {
+        return [...parent::__serialize(), 'mainPart' => $this->mainPart];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+        $this->mainPart = $data['mainPart'] ?? $data["\x00Symfony\Component\Mime\Part\Multipart\RelatedPart\x00mainPart"];
+    }
+
     private function generateContentId(): string
     {
         return bin2hex(random_bytes(16)).'@symfony';

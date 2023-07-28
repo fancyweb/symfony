@@ -18,7 +18,10 @@ use Symfony\Component\Mime\Header\Headers;
  */
 class SMimePart extends AbstractPart
 {
-    /** @internal */
+    /**
+     * @internal
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     protected Headers $_headers;
 
     private iterable|string $body;
@@ -90,8 +93,13 @@ class SMimePart extends AbstractPart
         return $headers;
     }
 
+    /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     public function __sleep(): array
     {
+        trigger_deprecation('symfony/mime', '6.4', 'The "%s()" method is deprecated and will be removed in Symfony 7.0.', __METHOD__);
+
         // convert iterables to strings for serialization
         if (is_iterable($this->body)) {
             $this->body = $this->bodyToString();
@@ -102,10 +110,34 @@ class SMimePart extends AbstractPart
         return ['_headers', 'body', 'type', 'subtype', 'parameters'];
     }
 
+    /**
+     * @deprecated since Symfony 6.4, to be removed in 7.0
+     */
     public function __wakeup(): void
     {
+        trigger_deprecation('symfony/mime', '6.4', 'The "%s()" method is deprecated and will be removed in Symfony 7.0.', __METHOD__);
+
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
+    }
+
+    public function __serialize(): array
+    {
+        // convert iterables to strings for serialization
+        if (is_iterable($this->body)) {
+            $this->body = $this->bodyToString();
+        }
+
+        return [...parent::__serialize(), 'body' => $this->body, 'type' => $this->type, 'subtype' => $this->subtype, 'parameters' => $this->parameters];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+        $this->body = $data['body'] ?? $data["\x00Symfony\Component\Mime\Part\SMimePart\x00body"];
+        $this->type = $data['type'] ?? $data["\x00Symfony\Component\Mime\Part\SMimePart\x00type"];
+        $this->subtype = $data['subtype'] ?? $data["\x00Symfony\Component\Mime\Part\SMimePart\x00subtype"];
+        $this->parameters = $data['parameters'] ?? $data["\x00Symfony\Component\Mime\Part\SMimePart\x00parameters"];
     }
 }
